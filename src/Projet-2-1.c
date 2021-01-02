@@ -18,13 +18,17 @@
 
 int main()
 {
-	int settingsChoice = 6;
+	int settingsChoice = -1;
+	int deleteChoice;
+	int loadChoice;
     puiss4 partie ;
 	while( 1 )
 	{
         system("clear");
 
         int choix_menu = menu_principal();
+		partie.quitPartie = 0;
+		settingsChoice = -1; // On initialise cett variable a une valeur qui permet d'entrer dans la boucle du case 5.
 
 		switch( choix_menu )
         {
@@ -32,7 +36,7 @@ int main()
 				puts("Merci et au revoir !");
 				return EXIT_SUCCESS;
 
-			case 1:
+			case 1: // Regles de jeu
                 system("clear"); //Le programme est destine a etre utilise sur linux, donc on peut utiliser cette commande
 
 				couleur( ROUGE );
@@ -48,7 +52,7 @@ int main()
                 flushbuff();
 				break;
 				
-			case 2:		
+			case 2: // Partie Normale		
 				system("clear");
 
 				set_default_settings();
@@ -58,12 +62,13 @@ int main()
                 system("clear");
 
     			initialisation( &partie );
+				tour = 0;
 				
 				affiche_jeu( partie );
 
-    			for( tour = 0; tour < (nbCol*nbLignes); tour++ )
+    			for( tour += 0; tour < (nbCol*nbLignes); tour++ )
     			{        
-                    
+
         			ajoute_pion( &partie, ( (tour) % 2 ) );
 
 					if( partie.resetPartie )
@@ -88,9 +93,16 @@ int main()
 						break;
 					}
     			}
+
+				if ( tour == (nbCol*nbLignes) )
+				{
+					printf("\nMatch Nul !\n\nAppuyer sur 'Entree' pour continuer...");
+					flushbuff();
+				}
+
     			break;
 				
-			case 5:
+			case 5: // Partie Libre
 
 				while( settingsChoice != 5)
 				{	
@@ -102,10 +114,11 @@ int main()
 				system("clear");
 
     			initialisation( &partie );
-				
+				tour = 0;
+
 				affiche_jeu( partie );
 
-    			for( tour = 0; tour < (nbCol*nbLignes); tour++ )
+    			for( tour += 0; tour < (nbCol*nbLignes); tour++ )
     			{        
                     
         			ajoute_pion( &partie, ( (tour) % 2 ) );
@@ -133,10 +146,88 @@ int main()
 					}
     			}
 
+				if ( tour == (nbCol*nbLignes) )
+				{
+					printf("\nMatch Nul !\n\nAppuyer sur 'Entree' pour continuer...");
+					flushbuff();
+				}
+
                 break;
+
+				case 6: // Charger une sauvegarde
+
+					while ( 1 )
+					{
+						loadChoice = savefile_menu("Charger une sauvegarde :");
+
+						if ( !loadChoice ) goto end_main_case_6;
+
+						if ( load_save( &partie, loadChoice ) )
+						{
+							printf("\nLa partie a ete chargee sans problemes.\nAppuyer sur 'Entree' pour continuer...");
+							flushbuff();
+							break;
+						}
+					}
+					
+					system("clear");
+					affiche_jeu( partie );
+
+		 			for( tour += 0; tour < (nbCol*nbLignes); tour++ )
+					{        
+
+						ajoute_pion( &partie, ( (tour) % 2 ) );
+
+						if( partie.resetPartie )
+						{	
+							system("clear");
+							affiche_jeu( partie );
+							ajoute_pion( &partie, tour%2 );
+							partie.resetPartie = 0;
+						}
+
+						if ( partie.quitPartie ) break; // Check si l'option 'quitter' du menu pause a ete choisi
+						
+						system("clear");
+						affiche_jeu( partie );
+
+						if ( gagne( partie, tour % 2) )
+						{	
+							if ( tour % 2 ) printf("\n%s a gagne !", nomJoueurDeux);
+							else printf ("\n%s a gagne !", nomJoueurUn);
+							printf("\n\nAppuyer sur 'Entree' pour continuer...");
+							flushbuff();
+							break;
+						}
+					}
+
+					if ( tour == (nbCol*nbLignes) )
+					{
+						printf("\nMatch Nul !\n\nAppuyer sur 'Entree' pour conitnuer...");
+						flushbuff();
+					}
+
+					end_main_case_6:
+					break;
+
+				case 7: // Supprimer une sauvegarde
+					while( 1 )
+					{
+						deleteChoice = savefile_menu("Supprimer une Sauvegarde :");
+						if ( !deleteChoice ) goto end_suppr_save;
+
+						if ( del_save( deleteChoice ) )
+						{
+							printf("\nSauvegarde supprimee\nAppuyer sur 'Entree' pour continuer...");
+							flushbuff();
+						}
+					}
+					end_suppr_save:
+					break;
 
 				
          	default:
+				printf("\nErreur : Valeur invalide. Termination du programme...\n");
             	exit( EXIT_FAILURE );
 		}
 	}

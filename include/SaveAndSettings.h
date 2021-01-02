@@ -48,7 +48,8 @@ extern char nomJoueurUn[PLAYER_NAME_SIZE], nomJoueurDeux[PLAYER_NAME_SIZE];
 // Definition fonctions
 
 /**
- * @brief permet a l'utilisateur de confirmer sa reponse. Renvoie 1 si l'utilisateur a bien confirme, 0 sinon.
+ * @brief permet a l'utilisateur de confirmer sa reponse. 
+ * Renvoie 1 si l'utilisateur a bien confirme, 0 sinon.
  * 
  * @return int 
  */
@@ -74,7 +75,8 @@ struct tm get_date();
 void player_name_change();
 
 /**
- * @brief Affiche de menu des reglages d'une partie libre et renvoie le nombre correspondant a ce que l'utilisateur a choisi 
+ * @brief Affiche de menu des reglages d'une partie libre
+ * Renvoie le nombre correspondant a ce que l'utilisateur a choisi 
  * 
  * @return int 
  */
@@ -102,19 +104,72 @@ void set_default_settings();
  */
 void savefile_display(int saveNumber);
 
-int savefile_menu();
+/**
+ * @brief Affiche les liste des sauvegardes et renvoie le choix de l'utilisateur
+ * Si savefile_menu renvoie 0, cela veut dire que l'utilisateur veut retourner a l'ecran precedent
+ * si ce que savefile_menu envoie est compris entre 1 et 3, ca veut dire que l'utilisateur a choisi un fichier de sauvegarde
+ * 
+ * @param menuType est une chaine de caractere qui indique la fonction qui va etre effectue si on choisit un fichier
+ * @return int 
+ */
+int savefile_menu( const char *menuType );
 
+/**
+ * @brief ecris dans un fichier de sauvegarde les details de la partie qui se deroule
+ * *un fichier de sauvegarde est organise de la maniere suivante :
+ * *ligne 1 : Nom du joueur 1 actuel
+ * *ligne 2 : Nom du joueur 2 actuel
+ * *lignes 3-5 : respectivement, jour du mois/mois/annee/heure de la journee/minute
+ * *ligne 6 : nombre du tour de jeu actuel
+ * *ligne 7 : nbLignes (parametre de nombre de lignes)
+ * *ligne 8 : nbCol (parametre de nombre de colonnes)
+ * *ligne 9 : nbPionsGagnant (parametre de nombres de pions a aligner)
+ * *lignes 10 - (nbLignes*nbCol) : valeurs des cases de la grille de jeu
+ * *lignes (nbLignes*nbCol + 1) - (nbLignes*nbCol+1 + nbCol) : variables dernierpion du struct puiss4
+ * 
+ * @param destFile pointeur sur le fichier de sauvegarde choisi
+ * @param savedGame struct puiss4 de la partie se deroulant 
+ * @return int 
+ */
 int write_savefile(FILE *destFile, puiss4 savedGame);
 
+/**
+ * @brief verifie que le fichier de sauvegarde choisi est plein, 
+ * et permet a l'utilisateur de confirmer l'ecrasement de la sauvegarde si c'est le cas
+ * 
+ * @param fileName chemin relatif du fichier de sauvegarde
+ * @param currentGame struct puiss4 de la partie se deroulant 
+ * @return int 
+ */
 int overwrite_file(const char *fileName, puiss4 currentGame);
 
 /**
- * @brief selectionne la sauvegarde que l'utilisateur a choisi pour pour pouvoir sauvegarder ou non. Renvoie 1 si une sauvegarde a ete effectuee, renvoie 0 sinon.
+ * @brief selectionne la sauvegarde que l'utilisateur a choisi pour pour pouvoir sauvegarder ou non. 
+ * Renvoie 1 si une sauvegarde a ete effectuee, renvoie 0 sinon.
  * 
  * @param game 
  * @param saveSlot
  * @return int 
  */
 int save(puiss4 game, int saveSlot);
+
+/**
+ * @brief supprime le contenu du fichier de sauvegarde choisi. L'utilisateur doit confirmer.
+ * Renvoie 1 si le contenu a ete supprime, 0 sinon
+ * 
+ * @param saveSlot numero du fichier de sauvegarde choisi
+ * @return int 
+ */
+int del_save( int saveSlot );
+
+/**
+ * @brief charge de le contenu de la sauvegarde sur le struct puiss4 et les variables globales
+ * Renvoie 1 si la charge s'est effectuee correctement, 0 sinon
+ * 
+ * @param saveSlot numero de la sauvegarde choisie
+ * @param destGrid
+ * @return int 
+ */
+int load_save( puiss4 *destGrid, int saveSlot );
 
 #endif
