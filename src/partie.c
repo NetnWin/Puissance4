@@ -109,7 +109,6 @@ int gagne( puiss4 jeu, int joueur )
                     printf("\nVictoire par ligne.");
                     return 1;
                 }
-
                 
                 if ( check_row( jeu, i, nbCol-1, 1, -1, PIONJ1 ) ) // sens backslash : moitie haute-droite de la grille
                 {
@@ -154,20 +153,20 @@ int gagne( puiss4 jeu, int joueur )
             {
                 if ( check_row( jeu, i, 0, 0, 1, PIONJ2 ) ) // verifie les lignes
                 {
-                    printf("\nJ2 Ligne = True");
+                    printf("\nVictoire par ligne.");
                     return 1;
                 }
 
                 
                 if ( check_row( jeu, i, nbCol-1, 1, -1, PIONJ2 ) ) // sens backslash : moitie haute-droite de la grille
                 {
-                    printf("\nJ2 backslash 2 = True");
+                    printf("\nVictoire par diagonale.");
                     return 1;
                 }
                 
                 if ( check_row( jeu, i, 0, 1, 1, PIONJ2 ) ) // sens slash : moitie haute-gauche de la grille
                 {
-                    printf("\nJ2 Slash 1 = True");
+                    printf("\nVictoire par diagonale.");
                     return 1;
                 }
 
@@ -178,19 +177,19 @@ int gagne( puiss4 jeu, int joueur )
                 
                 if ( check_row( jeu, 0, j, 1, 0, PIONJ2 ) ) // verifie les colonnes
                 {
-                    printf("\nJ2 Col = True");
+                    printf("\nVictoire par colonne.");
                     return 1;
                 }
 
                 if ( check_row( jeu, 0, j, 1, -1, PIONJ2 ) ) // sens backslash : moitie basse-gauche
                 {
-                    printf("\nJ2 backSlash 1 = True");
+                    printf("\nVictoire par diagonale.");
                     return 1;
                 }
 
                 if ( check_row( jeu, 0, j, 1, 1, PIONJ2 ) )// sens slash : moitie basse-droite
                 {
-                    printf("\nJ2 Slash 2 = True");
+                    printf("\nVictoire par diagonale.");
                     return 1;
                 }
 
@@ -211,6 +210,7 @@ puiss4 ajoute_pion(puiss4 *partiePuiss4, int joueur)
   int choice;
   int pauseChoice;
 
+    printf("\nTour n°%d\n", tour);
     if( joueur == 0 ) 
     {
         printf( "\nAu tour de %s.\n", nomJoueurUn );
@@ -242,6 +242,7 @@ puiss4 ajoute_pion(puiss4 *partiePuiss4, int joueur)
 
             system("clear");
             affiche_jeu(*partiePuiss4);
+            printf("\nTour n°%d\n", tour);
             if ( joueur ) printf("\nTour de %s\n", nomJoueurDeux);
             else printf( "\nTour de %s\n", nomJoueurUn );
             couleur(VERT);
@@ -253,7 +254,9 @@ puiss4 ajoute_pion(puiss4 *partiePuiss4, int joueur)
         {
             system("clear");
             affiche_jeu( *partiePuiss4 );
-            printf("\nTour Joueur %d\n", joueur+1);
+            printf("\nTour n°%d\n", tour);
+            if ( joueur ) printf("\nTour de %s\n", nomJoueurUn);
+            else printf("\nTour de %s\n", nomJoueurDeux);
             couleur(VERT);
             printf("Pour mettre pause, entrez la lettre p.\n");
             couleur(RESET);
@@ -308,11 +311,13 @@ int menu_principal(void)
 	puts("2 - Jouer a 2");
 	puts("3 - Partie rapide (1 manche)");
 	puts("4 - Jouer contre IA");
-	puts("5 - Mode libre (choix du nombre de manches et nombre lignes/colonnes"); 
+	puts("5 - Mode libre (choix du nombre de manches et nombre lignes/colonnes)"); 
+    puts("6 - Charger une sauvegarde");
+    puts("7 - Supprimer une sauvegarde");
     couleur(RESET);
 
     reads(choix, 2);
-    while( strtol(choix, NULL, 10) > 5 || strtol(choix, NULL, 10) < 0 || !strisnumber(choix))
+    while( strtol(choix, NULL, 10) > 7 || strtol(choix, NULL, 10) < 0 || !strisnumber(choix))
     {
         system("clear");
 
@@ -326,12 +331,13 @@ int menu_principal(void)
         puts("2 - Jouer a 2");
         puts("3 - Partie rapide (1 manche)");
         puts("4 - Jouer contre IA");
-        puts("5 - Mode libre (choix du nombre de manches et nombre lignes/colonnes"); 
-        puts("6 - Liste des sauvegardes");
+        puts("5 - Mode libre (choix du nombre de manches et nombre lignes/colonnes)"); 
+        puts("6 - Charger une sauvegarde");
+        puts("7 - Supprimer une sauvegarde");
         couleur(RESET);
 
         if( !strisnumber(choix) ) printf("\nCe que vous avez entre n'est pas un numero !\nVeuillez entrer un numero : ");
-        else if( strtol(choix, NULL, 10) > 6 || strtol(choix, NULL, 10) < 0) printf("\nLe numero doit etre compris entre 0 et 6.\nVeuillez entrer un autre numero : ");
+        else if( strtol(choix, NULL, 10) > 7 || strtol(choix, NULL, 10) < 0) printf("\nLe numero doit etre compris entre 0 et 6.\nVeuillez entrer un autre numero : ");
         
         reads(choix, 2);
     }
@@ -400,43 +406,47 @@ void pause( puiss4 *grilleDeJeu, int userInput )
     int loadChoice = -1;
     switch( userInput )
     {
-        case 0:
+        case 0: // Quitter la partie
             grilleDeJeu -> quitPartie = 1;
             break;
 
-        case 1:
+        case 1: // Sauvegarder
             while( 1 )
             {
-                system("clear");
-                printf("Menu de Sauvegarde :\n");
-                saveChoice = savefile_menu();
+                saveChoice = savefile_menu("Sauvegarder :");
                 if ( !saveChoice ) goto end_save_menu;
                 save(*grilleDeJeu, saveChoice);
             }
             end_save_menu:
             break;
         
-        case 2: 
+        case 2: // Charger une partie
             while( 1 )
             {
-                system("clear");
-                printf("Menu de Sauvegarde :\n");
-                loadChoice = savefile_menu();
+                loadChoice = savefile_menu("Chargement de sauvegarde:");
                 if ( !loadChoice ) goto end_load_menu;
-                save(*grilleDeJeu, loadChoice);
+                if ( load_save( grilleDeJeu, loadChoice) ) 
+                {   
+                    printf("\nLa partie a ete chargee sans problemes.\nAppuyer sur 'Entree' pour continuer...");
+                    flushbuff(); 
+                    goto end_load_menu;
+                }
             }
             end_load_menu:
             break;
         
-        case 3:
+        case 3: // Recommencer la partie
             tour = 0;
             initialisation( grilleDeJeu );
             grilleDeJeu -> resetPartie = 1;
             break;
         
-        case 4:
-            printf("\nAppuyer sur 'Entree' pour continuer...");
-            flushbuff();
+        case 4: // Continuer la partie
+            // Il ne se passe Rien du tout
             break;
+        
+        default:
+            printf("\nErreur : Valeur invalide. Termination du programme...\n");
+            exit(EXIT_FAILURE);
     }
 }

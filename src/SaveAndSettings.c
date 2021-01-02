@@ -172,7 +172,7 @@ void settings( int settingsChoice)
 
     switch (settingsChoice)
     {
-        case 0:
+        case 0: // Modifier le nombre de lignes
             
             printf("\n\nVeuillez entrer un nombre compris entre %d et %d : ", NB_LIGNE_MIN, NB_LIGNE_MAX);
 
@@ -196,7 +196,7 @@ void settings( int settingsChoice)
 
             break;
         
-        case 1:
+        case 1: // Modifier le nombre de colonnes
 
             printf("\n\nVeuillez entrer un nombre compris entre %d et %d : ", NB_COL_MIN, NB_COL_MAX);
 
@@ -220,7 +220,7 @@ void settings( int settingsChoice)
 
             break;
 
-        case 2:
+        case 2: // modifier le nombre de pions a aligner
 
             printf("Veuillez entrer un nombre compris entre %d et %d ( max delimite par les nombres de colonnes et de lignes) : ", NB_PIONS_WIN_MIN, min( nbLignes, nbCol ));
 
@@ -237,11 +237,11 @@ void settings( int settingsChoice)
 
             break;
         
-        case 3:
+        case 3: // modifier le nom des joueurs
             player_name_change();
             break;
 
-        case 4:
+        case 4: // mettre les reglages par defaut
             set_default_settings();
             break;
 
@@ -269,18 +269,20 @@ void savefile_display(int saveNumber)
 
     snprintf( filePath, 25, "savefiles/save%d.SAV", saveNumber );
 
-    fileToRead = fopen ( filePath, "r");
+    fileToRead = fopen ( filePath, "a+"); // on utilise le mode a+ pour ne pas ecraser le file, que ça puisse en creer un s'il n'existe pas, et qu'on puisse lire et ecrire dans le file 
 
     if ( fileToRead == NULL ) 
     {
         printf("Erreur : ouverture du fichier impossible.\nLa sauvegarde n'a pas pu etre affichee.\n");
-        exit(EXIT_FAILURE);
+        fclose (fileToRead);
+        return;
     }
 
-    if ( fseek( fileToRead, 0, SEEK_END) ) 
+    else if ( fseek( fileToRead, 0, SEEK_END) ) // en soit, ce n'est pas obliger de mettre cette commande parce qu'on est en mode a+ (donc le curseur est deja a la fin), mais c'est juste pour etre sur
     {
         printf( "\nErreur : le curseur n'a pas pu etre place a la fin du fichier.\nLa sauvegarde n'a pas pu etre affichee.\n" );
-        exit(EXIT_FAILURE);
+        fclose(fileToRead);
+        return;
     }
 
     if ( ftell( fileToRead ) == 0 ) 
@@ -292,7 +294,8 @@ void savefile_display(int saveNumber)
         if ( fseek( fileToRead, 0, SEEK_SET ) ) 
         {
             printf( "\nErreur : le curseur n'a pas pu etre place au debut du fichier.\nLa sauvegarde n'a pas pu etre affichee.\n" );
-            exit(EXIT_FAILURE);
+            fclose(fileToRead);
+            return;
         }
 
         //Affichage des joueurs
@@ -330,11 +333,14 @@ void savefile_display(int saveNumber)
 }
 
 
-int savefile_menu()
+int savefile_menu(const char *menuType)
 {
+    system("clear");
+
     char choix[2];
     int numChoix;
 
+    printf("%s\n", menuType);
     puts("-----------------------------------------------");
     puts("            FICHIERS DE SAUVEGARDES            ");
     puts("-----------------------------------------------");
@@ -344,38 +350,46 @@ int savefile_menu()
     couleur(VERT);
 
     printf("1 - ");
+    couleur(JAUNE);
     savefile_display(1);
+    couleur(VERT);
 
     printf("2 - ");
+    couleur(JAUNE);
     savefile_display(2);
+    couleur(VERT);
 
     printf("3 - ");
+    couleur(JAUNE);
     savefile_display(3);
-    
     couleur(RESET);
 
     reads(choix, 2);
     while( strtol(choix, NULL, 10) > 5 || strtol(choix, NULL, 10) < 0 || !isdigit(choix[0]))
     {   
         system("clear");
-
+        printf("%s\n", menuType);
         puts("-----------------------------------------------");
         puts("            FICHIERS DE SAUVEGARDES            ");
         puts("-----------------------------------------------");
 
         couleur(ROUGE);
-        printf("0 - Retour\n\n");
+        printf("0 - Retour\n");
         couleur(VERT);
 
         printf("1 - ");
+        couleur(JAUNE);
         savefile_display(1);
+        couleur(VERT);
 
         printf("2 - ");
+        couleur(JAUNE);
         savefile_display(2);
+        couleur(VERT);
 
         printf("3 - ");
+        couleur(JAUNE);
         savefile_display(3);
-        
         couleur(RESET);
 
         if( !strisnumber(choix) ) printf("\nCe que vous avez entre n'est pas un numero !\nVeuillez entrer un numero : ");
@@ -403,9 +417,9 @@ int write_savefile(FILE *destFile, puiss4 savedGame)
 
     fprintf(destFile, "%s\n", nomJoueurUn);
     fprintf(destFile, "%s\n", nomJoueurDeux);
-    fprintf(destFile, "%d\n", date.tm_year );
-    fprintf(destFile, "%d\n", date.tm_mon );
     fprintf(destFile, "%d\n", date.tm_mday );
+    fprintf(destFile, "%d\n", date.tm_mon );
+    fprintf(destFile, "%d\n", date.tm_year );
     fprintf(destFile, "%d\n", date.tm_hour );
     fprintf(destFile, "%d\n", date.tm_min );
     fprintf(destFile, "%d\n", tour);
@@ -435,7 +449,7 @@ int overwrite_file(const char *fileName, puiss4 currentGame)
 
 
     int confirmation = 0;
-    saveFile = fopen(fileName, "r+");
+    saveFile = fopen(fileName, "a+");
 
     if ( saveFile == NULL )
     {
@@ -443,11 +457,18 @@ int overwrite_file(const char *fileName, puiss4 currentGame)
         return 0;
     }
 
-    fseek(saveFile, 0, SEEK_END);
+    if (fseek(saveFile, 0, SEEK_END))
+    {
+        printf("\nErreur : le curseur n'a pas pu etre place a la fin du fichier de sauvegarde.\n");
+        fclose(saveFile);
+        return 0;
+    }
 
     if ( ftell( saveFile ) == 0 )
     {
         write_savefile(saveFile, currentGame);
+        fclose( saveFile );
+        return 1;
     }
     else
     {   
@@ -455,13 +476,22 @@ int overwrite_file(const char *fileName, puiss4 currentGame)
         confirmation = confirm_answer();
         if ( confirmation )
         {
-            if ( !write_savefile(saveFile, currentGame) ) printf("Erreur : l'ecriture de la sauvegarde n'a pas pu etre effectuee.\n");
+            fclose( saveFile ); // en mode a+, toutes les fonctions qui ecrivent dans le fichier remettent le curseur a la fin, donc on passe en mode w pour ecraser le fichier
+            saveFile = fopen ( fileName, "w");
+            if ( !write_savefile(saveFile, currentGame) ) 
+            {
+                printf("Erreur : l'ecriture de la sauvegarde n'a pas pu etre effectuee.\n");
+                fclose(saveFile);
+                return 0;
+            }
+            fclose( saveFile );
+            return 1;
         }
     }
     
     fclose(saveFile);
 
-    return confirmation;
+    return 0;
 }
 
 int save( puiss4 game, int saveSlot )
@@ -480,4 +510,133 @@ int save( puiss4 game, int saveSlot )
     flushbuff(); 
 
     return 1;
+}
+
+int del_save( int saveSlot)
+{
+    char slotPath[25];
+    int confirmation = 0;
+
+    FILE *deletedSave;
+
+    printf("\nLa sauvegarde ne pourra pas etre recuperee.\n");
+    confirmation = confirm_answer();
+
+    if ( confirmation )
+    {
+        snprintf( slotPath, 25, "savefiles/save%d.SAV", saveSlot);
+
+        deletedSave = fopen( slotPath, "w");
+
+        if ( deletedSave == NULL )
+        {
+            printf( "\nErreur : le fichier de sauvegarde n'a pas pu etre ouvert.\nAppuyer sur 'Entree' pour continuer...");
+            flushbuff();
+            return 0;
+        }
+
+        fclose( deletedSave );
+
+        return 1;
+    }
+
+    return 0;
+
+}
+
+int load_save( puiss4 *destGrid, int saveSlot )
+{
+    char slotPath[25], tempBuffer[25];
+    int confirmation;
+
+    FILE *loadedFile = NULL;
+
+    snprintf( slotPath, 25, "savefiles/save%d.SAV", saveSlot);
+
+    loadedFile = fopen( slotPath, "r" );
+
+    if ( loadedFile == NULL )
+    {
+        printf( "\nErreur : le programme n'a pas pu acceder au fichier de sauvegarde.\n" );
+    }
+
+    if( fseek(loadedFile, 0, SEEK_END) )
+    {
+        printf("\nErreur : le curseur n'a pas pu etre place a la fin du fichier.\n");
+
+        fclose(loadedFile);
+        return 0;
+    }
+
+    if( ftell( loadedFile ) == 0 )
+    {
+        printf("\nLe fichier choisi est vide.\n");
+        fclose( loadedFile );
+        return 0;
+    }
+    else
+    {
+        confirmation = confirm_answer();
+        if ( !confirmation )
+        {
+            fclose ( loadedFile );
+            return 0;
+        }
+
+        if( fseek( loadedFile, 0, SEEK_SET ) )
+        {
+            printf("\nErreur : le curseur n'a pas pu etre place au debut du fichier.\n");
+            fclose(loadedFile);
+            return 0;
+        }
+
+        // Chargement des noms de joueur
+        readfile( tempBuffer, 25, loadedFile );
+        strcpy( nomJoueurUn, tempBuffer );
+
+        readfile( tempBuffer, 25, loadedFile );
+        strcpy( nomJoueurDeux, tempBuffer );
+
+        //On passe les lignes de date
+        for ( int i = 0; i < 5; i++ )
+        {
+            readfile( tempBuffer, 25, loadedFile );
+        }
+        
+        // Chargement du numero de tour
+        readfile( tempBuffer, 25, loadedFile );
+        tour = strtol( tempBuffer, NULL, 10);
+
+        // Chargement des parametres de jeu
+        readfile( tempBuffer, 25, loadedFile );
+        nbLignes = strtol( tempBuffer, NULL, 10);
+
+        readfile( tempBuffer, 25, loadedFile );
+        nbCol = strtol( tempBuffer, NULL, 10);
+
+        readfile( tempBuffer, 25, loadedFile );
+        nbPionsGagnant = strtol( tempBuffer, NULL, 10);
+
+        // Chargements du struct puiss4
+        for ( int ligne = 0; ligne < nbLignes; ligne++ )
+        {
+            for ( int colonne = 0; colonne < nbCol; colonne++ )
+            {
+                readfile( tempBuffer, 25, loadedFile );
+                destGrid->grille [ ligne ] [ colonne ] = strtol( tempBuffer, NULL, 10);
+            }
+        }
+
+        for ( int h = 0; h < nbCol; h++ )
+        {
+            readfile( tempBuffer, 25, loadedFile);
+            destGrid->dernier_pion [ h ] = strtol( tempBuffer, NULL, 10);
+        }
+
+        fclose( loadedFile );
+        return 1;
+    }
+    
+    fclose( loadedFile );
+    return 0;
 }
