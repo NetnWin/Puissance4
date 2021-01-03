@@ -66,6 +66,10 @@ int confirm_answer();
  */
 int min(int a, int b);
 
+/**
+ * @brief Renvoie un struct tm (venant de time.h) contenant la date et l'heure au moment de l'appel de la fonction
+ * 
+ * @return struct tm
 struct tm get_date();
 
 /**
