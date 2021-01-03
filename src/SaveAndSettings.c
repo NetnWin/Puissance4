@@ -59,7 +59,7 @@ struct tm get_date()
     brokenDate = localtime( &rawTime );
 
     brokenDate -> tm_year += 1900;
-    if (brokenDate -> tm_mon == 0) brokenDate -> tm_mon = 12;
+    ++(brokenDate -> tm_mon);
 
     return *brokenDate;
 }
