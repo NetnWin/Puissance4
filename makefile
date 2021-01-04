@@ -13,4 +13,4 @@ OBJS = src/partie.c src/Projet-2-1.c src/safeinput.c src/SaveAndSettings.c
 EXEC_NAME = Exec
 
 finalmake : $(OBJS)
-		$(CCWIN) $(GFLAG) $(WFLAGS) $(IFLAGS) $(OBJS) -o $(EXEC_NAME) 
+		$(CC) $(GFLAG) $(WFLAGS) $(IFLAGS) $(OBJS) -o $(EXEC_NAME) 
