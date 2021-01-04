@@ -24,6 +24,22 @@ int nbPionsGagnant = NB_PIONS_WIN_DEFAULT;
 int tour = 0;
 char nomJoueurUn[PLAYER_NAME_SIZE] = "Joueur1", nomJoueurDeux[PLAYER_NAME_SIZE] = "Joueur2";
 
+
+
+void clear_screen()
+{
+    #ifdef _WIN32
+
+    system("cls");
+
+    #endif
+
+    #ifdef __linux__
+
+    system("clear");
+
+    #endif
+}
 int confirm_answer()
 {
     char confirm[2];
@@ -77,7 +93,7 @@ void player_name_change()
 
     while (!confirmation)
     {   
-        system("clear");
+        clear_screen();
         printf("\nEntrez le nom du Joueur 1: ");
         reads(nomJoueurUn, PLAYER_NAME_SIZE);
         printf("\nEntrez le nom du Joueur 2: ");
@@ -124,7 +140,7 @@ int settings_menu()
         reads(choix, 2);
         while( strtol(choix, NULL, 10) > 5 || strtol(choix, NULL, 10) < 0 || !isdigit(choix[0]))
         {   
-            system("clear");
+            clear_screen();
 
             puts("--------------------------------");
             puts("            SETTINGS            ");
@@ -335,7 +351,7 @@ void savefile_display(int saveNumber)
 
 int savefile_menu(const char *menuType)
 {
-    system("clear");
+    clear_screen();
 
     char choix[2];
     int numChoix;
@@ -367,7 +383,7 @@ int savefile_menu(const char *menuType)
     reads(choix, 2);
     while( strtol(choix, NULL, 10) > 5 || strtol(choix, NULL, 10) < 0 || !isdigit(choix[0]))
     {   
-        system("clear");
+        clear_screen();
         printf("%s\n", menuType);
         puts("-----------------------------------------------");
         puts("            FICHIERS DE SAUVEGARDES            ");

@@ -48,6 +48,12 @@ extern char nomJoueurUn[PLAYER_NAME_SIZE], nomJoueurDeux[PLAYER_NAME_SIZE];
 // Definition fonctions
 
 /**
+ * @brief Fonction qui s'adapte à l'OS (Uniquement Windows et Linux) pour appeler une commande de terminal qui enleve tout ce qu'il y a sur l'ecran du terminal
+ * 
+ */
+void clear_screen();
+
+/**
  * @brief permet a l'utilisateur de confirmer sa reponse. 
  * Renvoie 1 si l'utilisateur a bien confirme, 0 sinon.
  * 
@@ -70,6 +76,7 @@ int min(int a, int b);
  * @brief Renvoie un struct tm (venant de time.h) contenant la date et l'heure au moment de l'appel de la fonction
  * 
  * @return struct tm
+*/
 struct tm get_date();
 
 /**

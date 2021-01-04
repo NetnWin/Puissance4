@@ -24,7 +24,7 @@ int main()
     puiss4 partie ;
 	while( 1 )
 	{
-        system("clear");
+        clear_screen();
 
         int choix_menu = menu_principal();
 		partie.quitPartie = 0;
@@ -37,7 +37,7 @@ int main()
 				return EXIT_SUCCESS;
 
 			case 1: // Regles de jeu
-                system("clear"); //Le programme est destine a etre utilise sur linux, donc on peut utiliser cette commande
+                clear_screen(); 
 
 				couleur( ROUGE );
 				printf( "Regles du jeu: \n\n" );
@@ -53,13 +53,13 @@ int main()
 				break;
 				
 			case 2: // Partie Normale		
-				system("clear");
+				clear_screen();
 
 				set_default_settings();
 
 				player_name_change();
 
-                system("clear");
+                clear_screen();
 
     			initialisation( &partie );
 				tour = 0;
@@ -71,9 +71,9 @@ int main()
 
         			ajoute_pion( &partie, ( (tour) % 2 ) );
 
-					if( partie.resetPartie )
+					if( partie.resetPartie ) // Si la partie est recommencee, le joueur 1 (puisque tour est remis à zero) joue tout de suite
 					{	
-						system("clear");
+						clear_screen();
 						affiche_jeu( partie );
 						ajoute_pion( &partie, tour%2 );
 						partie.resetPartie = 0;
@@ -81,7 +81,7 @@ int main()
 
 					if ( partie.quitPartie ) break; // Check si l'option 'quitter' du menu pause a ete choisi
                     
-                    system("clear");
+                    clear_screen();
         			affiche_jeu( partie );
 
                     if ( gagne( partie, tour % 2) )
@@ -106,12 +106,12 @@ int main()
 
 				while( settingsChoice != 5)
 				{	
-					system("clear");
+					clear_screen();
 					settingsChoice = settings_menu();
 					settings( settingsChoice );
 				}
 
-				system("clear");
+				clear_screen();
 
     			initialisation( &partie );
 				tour = 0;
@@ -125,7 +125,7 @@ int main()
 
 					if( partie.resetPartie )
 					{
-						system("clear");
+						clear_screen();
 						affiche_jeu( partie );
 						ajoute_pion( &partie, tour%2 );
 						partie.resetPartie = 0;
@@ -133,7 +133,7 @@ int main()
 
 					if ( partie.quitPartie ) break;
                     
-                    system("clear");
+                    clear_screen();
         			affiche_jeu( partie );
 
                     if ( gagne( partie, tour % 2) )
@@ -170,7 +170,7 @@ int main()
 						}
 					}
 					
-					system("clear");
+					clear_screen();
 					affiche_jeu( partie );
 
 		 			for( tour += 0; tour < (nbCol*nbLignes); tour++ )
@@ -180,7 +180,7 @@ int main()
 
 						if( partie.resetPartie )
 						{	
-							system("clear");
+							clear_screen();
 							affiche_jeu( partie );
 							ajoute_pion( &partie, tour%2 );
 							partie.resetPartie = 0;
@@ -188,7 +188,7 @@ int main()
 
 						if ( partie.quitPartie ) break; // Check si l'option 'quitter' du menu pause a ete choisi
 						
-						system("clear");
+						clear_screen();
 						affiche_jeu( partie );
 
 						if ( gagne( partie, tour % 2) )
@@ -214,7 +214,7 @@ int main()
 					while( 1 )
 					{
 						deleteChoice = savefile_menu("Supprimer une Sauvegarde :");
-						if ( !deleteChoice ) goto end_suppr_save;
+						if ( !deleteChoice ) goto end_main_case_7;
 
 						if ( del_save( deleteChoice ) )
 						{
@@ -222,7 +222,7 @@ int main()
 							flushbuff();
 						}
 					}
-					end_suppr_save:
+					end_main_case_7:
 					break;
 
 				
